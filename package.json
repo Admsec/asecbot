@@ -1,0 +1,20 @@
+{
+  "name": "koibot",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "npx tsx index.ts",
+  },
+  "type": "module",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@types/node": "^22.10.0",
+    "axios": "^1.7.8",
+    "node-napcat-ts": "^0.4.0",
+    "tsx": "^4.19.2",
+    "yaml": "^2.6.1"
+  }
+}

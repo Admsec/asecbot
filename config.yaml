@@ -1,0 +1,12 @@
+napcat:
+  baseUrl: 'ws://localhost:3001'
+  accessToken: ''
+  throwPromise: false  # 是否需要在触发 socket.error 时抛出错误，默认关闭
+  reconnection:
+    enable: true
+    attempts: 10
+    delay: 5000  # 单位可能是毫秒（ms）
+  debug: false
+
+self:
+  master: [1447007223] # 主人
