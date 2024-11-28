@@ -2,6 +2,39 @@
 
 使用方法：
 
+1. 下载并配置 napcat, 并配置 NapCat 端为 websocket 服务端
+
+   [NapCat: NapCatQQ现代化的基于 NTQQ 的 Bot 协议端实现](https://napneko.github.io/)
+
+   ```json
+   // [napcat]/config/onebot11_*.json 
+   {
+     "network": {
+       "httpServers": [],
+       "httpClients": [],
+       "websocketServers": [
+         {
+           "name": "main",
+           "enable": true,
+           "host": "0.0.0.0",
+           "port": 3001,
+           "messagePostFormat": "array",
+           "reportSelfMessage": false,
+           "token": "",
+           "enableForcePushEvent": true,
+           "debug": false,
+           "heartInterval": 30000
+         }
+       ],
+       "websocketClients": []
+     },
+     "musicSignUrl": "",
+     "enableLocalFile2Url": false
+   }
+   ```
+
+   
+
 1. 下载该项目
 
 ```
