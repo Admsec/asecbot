@@ -1,10 +1,11 @@
 import { join } from "path";
 import { existsSync, mkdirSync, readdirSync } from "fs";
-import { logger, NCWebsocket, Structs } from "node-napcat-ts";
+import { NCWebsocket, Structs } from "node-napcat-ts";
 import axios from "axios";
 import type { EventHandleMap } from "node-napcat-ts";
 import { Config } from "./config";
-import * as process from "node:process";
+import {createJiti} from "jiti"
+import {logger} from "./index";
 
 // export declare function definePlugin(plugin: KoiPlugin): KoiPlugin;
 export function definePlugin(plugin: KoiPlugin): KoiPlugin {
@@ -29,8 +30,11 @@ export class PluginManager {
   public bot: NCWebsocket;
   public ctx: KoiPluginContext;
   private tempListener: Array<listener>;
+  private jiti: any;
   constructor(bot: NCWebsocket, config: Config) {
     this.plugins = new Map<string, PluginInfo>();
+    // @ts-ignore
+    this.jiti = createJiti(import.meta.url, { moduleCache: false})
     this.bot = bot;
     this.tempListener = [];
     this.ctx = {
@@ -49,10 +53,10 @@ export class PluginManager {
         },
         restart: () =>{
           return this.restart()
-        }
-        // reloadPlugin: (pluginName: string): Promise<string>=> {
-        //   return this.reloadPlugin(pluginName)
-        // },
+        },
+        reloadPlugin: (pluginName: string): Promise<string>=> {
+          return this.reloadPlugin(pluginName)
+        },
       },
       handle: (eventName: any, func) => {
         const obj = {
@@ -84,21 +88,8 @@ export class PluginManager {
       // 初始化 ctx
       
       const pluginList = readdirSync(path_);
-      let success = 1,
+      let success = 0,
         fail = 0;
-      
-      // 导入系统插件
-      await koi_cmd.setup?.(this.ctx);
-      this.plugins.set(koi_cmd.name, {
-        version: koi_cmd.version || "0.1.0",
-        description: koi_cmd.description || "",
-        setup: {
-          enable: false,
-          listeners: this.tempListener
-        }
-      })
-      console.log(this.onPlugin(koi_cmd.name));
-      this.tempListener = [];
       
       for (const p of pluginList) {
         const pluginPath = join(path_, p, "index.ts");
@@ -110,8 +101,8 @@ export class PluginManager {
           fail++;
         }
       }
-      console.info(
-        `插件加载完毕, 一共导入${
+      logger.info(
+        `[+]插件加载完毕, 一共导入${
           success + fail
         }个插件, 成功: ${success}, 失败: ${fail}`
       );
@@ -123,7 +114,8 @@ export class PluginManager {
   }
 
   async loadPlugin(pluginPath: string) {
-    const plugin = await import(`file://${pluginPath}`)
+    // const plugin = await import(`file://${pluginPath}`)
+    const plugin = await this.jiti.import(pluginPath)
     plugin.default.setup(this.ctx)
     this.plugins.set(plugin.default.name, {
       version: plugin.default.version || "0.1.0",
@@ -133,7 +125,7 @@ export class PluginManager {
         listeners: this.tempListener
       }
     })
-    console.log(this.onPlugin(plugin.default.name))
+    logger.info(this.onPlugin(plugin.default.name))
     this.tempListener = [];
     return plugin;
 
@@ -172,26 +164,27 @@ export class PluginManager {
     return `[+]插件${pluginName}已启用`
   }
 
-  // reloadPlugin(pluginName: string): Promise<string> {
-  //   return new Promise((resolve, reject) => {
-  //     if(!this.plugins.has(pluginName)){
-  //       resolve("[-]该插件不存在")
-  //     }
-  //     const pluginPath = join(process.cwd(), "plugins" ,pluginName, "index.ts");
-  //     if(!existsSync(pluginPath)){
-  //       resolve(`[-]重载失败, 请确认插件文件是否存在: ${pluginPath}`)
-  //     }
-  //     if(this.plugins.get(pluginName).setup.enable){
-  //       console.log(this.offPlugin(pluginName));
-  //     }
-  //
-  //     this.loadPlugin(pluginPath).then((result) => {
-  //       resolve(`[+]插件${pluginName}已重载`);
-  //       console.log(result)
-  //
-  //     })
-  //   })
-  // }
+  reloadPlugin(pluginName: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      if(!this.plugins.has(pluginName)){
+        resolve("[-]该插件不存在")
+      }
+      const pluginPath = join(process.cwd(), "plugins" ,pluginName, "index.ts");
+      if(!existsSync(pluginPath)){
+        resolve(`[-]重载失败, 请确认插件文件是否存在: ${pluginPath}`)
+      }
+      // @ts-ignore
+      if(this.plugins.get(pluginName).setup.enable){
+        logger.info(this.offPlugin(pluginName));
+      }
+
+      this.loadPlugin(pluginPath).then((result) => {
+        resolve(`[+]插件${pluginName}已重载`);
+        logger.info(result)
+
+      })
+    })
+  }
 
 
   pluginIsEnabled(plugin: PluginInfo){
@@ -200,80 +193,14 @@ export class PluginManager {
   
 }
 
-const koi_cmd: KoiPlugin = {
-  name: "koi_cmd",
-  version: "0.1.0",
-  description: "基础插件",
-  setup: async (ctx: KoiPluginContext) => {
-    ctx.handle("message", async (e) => {
-      if (!ctx.isMaster(e)) return;
-      if (e.raw_message.startsWith(".p")) {
-        let msg = "", count = 0;
-        const key = e.raw_message.split(" ")
-        msg += "〓 插件列表 〓 \n"
-        switch (key?.[1]) {
-          case "ls":
-            const pluginMap = ctx.plugin.getPlugins();
-            pluginMap.forEach((value: PluginInfo, index) => {
-              if(value.setup.enable != false){
-                msg += `🟢 ${index}`
-              } else {
-                msg += `🔴 ${index}`
-              }
-              
-              if(++count != pluginMap.size){
-                msg += "\n"
-              }
-          })
-              break;
-          case 'on':
-            const onPluginName = key?.[2];
-            if(!onPluginName) {
-              msg = "[-]请输入要启用的插件名";
-              break;
-            }
-            const onPluginResult = ctx.plugin.onPlugin(onPluginName);
-            msg = onPluginResult;
-            break;
-          case 'off':
-            const offPluginName = key?.[2];
-            if(!offPluginName) {
-              msg = "[-]请输入要启用的插件名";
-              break;
-            }
-            const offPluginResult = ctx.plugin.offPlugin(offPluginName);
-            msg = offPluginResult;
-            break;
-          // case 'reload':
-          //   const reloadPluginName = key?.[2];
-          //   if(!reloadPluginName) {
-          //     msg = "[-]请输入要重载的插件名";
-          //     break;
-          //   }
-          //   const reloadPluginResult = ctx.plugin.reloadPlugin(reloadPluginName);
-          //   msg = await reloadPluginResult;
-          //   break;
-            default:
-              msg = help();
-          }
-          await e.quick_action([Structs.text(msg)])
-        }
-        function help() {
-          // return `.p 查看帮助\n.p ls 插件列表\n.p on [插件] 启用插件\n.p off [插件] 禁用插件\n.p reload [插件] 重载插件`;
-          return `.p 查看帮助\n.p ls 插件列表\n.p on [插件] 启用插件\n.p off [插件] 禁用插件`;
-        }
-      })
 
-
-    }
-  }
 
 interface pluginUtil{
   getPlugins: () => Map<string, PluginInfo>;
   onPlugin: (pluginName: string) => string;
   offPlugin: (pluginName: string) => string;
   restart: () => void;
-  // reloadPlugin: (pluginName: string) => Promise<string>;
+  reloadPlugin: (pluginName: string) => Promise<string>;
 }
 // interface plugins{
 //   listener: Array<object>,
@@ -293,16 +220,6 @@ interface KoiPluginContext {
     handler: EventHandleMap[EventName]
   ) => any;
   /** 是否为主人 */
-  // isOwner: (
-  //   id:
-  //     | number
-  //     | {
-  //         sender: {
-  //           user_id: number;
-  //         };
-  //       }
-  // ) => boolean;
-  /** 是否为管理员 */
   isMaster: (
     id:
       | number
@@ -324,7 +241,7 @@ interface KoiPluginContext {
   // ) => boolean;
 }
 
-export interface KoiPlugin {
+interface KoiPlugin {
   /** 插件 ID */
   name: string;
   /** 插件版本 */

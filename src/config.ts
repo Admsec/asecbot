@@ -1,20 +1,19 @@
 import {existsSync, readFileSync, writeFileSync} from 'fs';
-import {logger} from 'node-napcat-ts';
 import {join} from 'path';
 import {parse} from 'yaml';
+import {logger} from "./index";
 
 
 export function getConfig(): Config{
+  initConfig()
   return parse(readFileSync(join(process.cwd(), "config.yaml"), "utf-8"))
 }
 
 export function initConfig(): void{
   const configPath = join(process.cwd(), "config.yaml")
-  logger.dir("[+]读取配置文件信息: " + configPath)
   if(!existsSync(configPath)){
     writeFileSync(configPath, defaultConfig, "utf-8");
   }
-
 }
 
 const defaultConfig = `\

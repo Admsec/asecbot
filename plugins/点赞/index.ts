@@ -1,5 +1,5 @@
 import { logger, Structs } from "node-napcat-ts";
-import { definePlugin } from "../../plugin";
+import { definePlugin } from "../../src/plugin";
 
 export default definePlugin({
   name: "点赞",

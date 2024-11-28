@@ -1,6 +1,9 @@
-import { logger, NCWebsocket, Structs } from "node-napcat-ts";
+import {  NCWebsocket, Structs } from "node-napcat-ts";
 import { Config, getConfig } from "./config";
-import { KoiPlugin, PluginManager } from "./plugin";
+import { PluginManager} from "./plugin";
+import {join} from "path";
+import {existsSync, mkdirSync} from "fs";
+import winston from "winston";
 
 
 const logo = `
@@ -31,6 +34,32 @@ KoiBot 一个基于 node-napcat-ts 的 QQ 机器人
 参考: kivibot@viki && Abot@takayama
 @auther: Admsec github: https://github.com/Admsec\
 `
+const logPath = join(process.cwd(), "log")
+if(!existsSync(logPath)) mkdirSync(logPath);
+const logFileName = join(logPath, new Date().toLocaleString().split(" ")[0].replace(/\//g, "-") + ".log")
+const alignColorsAndTime = winston.format.combine(
+
+    winston.format.colorize(),
+    winston.format.timestamp({
+
+      format:"YY-MM-DD HH:mm:ss"
+    }),
+    winston.format.colorize({
+      all:true,
+    }),
+    winston.format.printf(
+        info => `${info.level} ${info.timestamp} ${info.message}`
+    )
+);
+export const logger = winston.createLogger({
+  level: "info",
+  transports: [
+    new (winston.transports.Console)({
+      format: winston.format.combine(winston.format.colorize(), alignColorsAndTime)
+    }),
+    new winston.transports.File({ filename: logFileName }) // 文件输出
+  ],
+});
 
 
 export class Bot{
@@ -54,18 +83,19 @@ export class Bot{
   }
   async start(){
     // logger.warn(logo)
-    console.info(logo)
+    // console.info(logo)
+    logger.info(logo)
     this.bot.on("socket.open", (ctx) => {
-      logger.dir("[*]开始连接 " + this.config.napcat.baseUrl)
+      logger.info("[*]开始连接 " + this.config.napcat.baseUrl)
     })
     this.bot.on("socket.error", (ctx) => {
-      logger.warn("[-]websocket 连接错误: " + ctx.error_type)
+      logger.error("[-]websocket 连接错误: " + ctx.error_type)
     })
     this.bot.on("socket.close", (ctx) => {
-      logger.warn("[-]websocket 连接关闭: " + ctx.code)
+      logger.error("[-]websocket 连接关闭: " + ctx.code)
     })
     this.plugins = await this.pluginManager.init()
     await this.bot.connect()
   }
 }
-new Bot().start()
+
