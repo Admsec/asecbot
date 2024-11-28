@@ -1,5 +1,7 @@
 import {Structs} from "node-napcat-ts";
 import {definePlugin} from "../../src/plugin";
+import {join} from "path";
+import {existsSync} from "fs";
 
 export default definePlugin({
     name: "koi_cmd",
@@ -28,12 +30,34 @@ export default definePlugin({
                         break;
                     case 'on':
                         const onPluginName = key?.[2];
+                        const plugins = ctx.plugin.getPlugins();
                         if(!onPluginName) {
                             msg = "[-]请输入要启用的插件名";
                             break;
                         }
-                        const onPluginResult = ctx.plugin.onPlugin(onPluginName);
-                        msg = onPluginResult;
+
+                        // 如果缓存里有
+                        if(plugins.has(onPluginName)) {
+                            if(plugins.get(onPluginName).setup.enable){
+                                msg = `[-]插件${onPluginName}已经在运行中`;
+                                break;
+                            }
+                            msg = ctx.plugin.onPlugin(onPluginName);
+                        } else {
+                        // 从插件目录搜寻插件
+                            const onPluginPath = join(process.cwd(), "plugins", onPluginName, "index.ts");
+                            if(!existsSync(onPluginPath)){
+                                msg = `[-]未找到该插件, 请确认插件存在: ${onPluginName}`
+                                break;
+                            }
+                                const onPluginResult = await ctx.plugin.loadPlugin(onPluginPath)
+                                if(!onPluginResult){
+                                    msg = `[-]插件启用失败: ${onPluginName}, 具体原因请看日志`
+                                    break;
+                                }
+                                msg = `[+]插件${onPluginName}已启用`
+                        }
+
                         break;
                     case 'off':
                         const offPluginName = key?.[2];
@@ -50,8 +74,13 @@ export default definePlugin({
                             msg = "[-]请输入要重载的插件名";
                             break;
                         }
-                        const reloadPluginResult = ctx.plugin.reloadPlugin(reloadPluginName);
-                        msg = await reloadPluginResult;
+                        const reloadPluginResult = await ctx.plugin.reloadPlugin(reloadPluginName);
+                        if(!reloadPluginResult){
+                            msg = `[-]插件${reloadPluginName}重载失败`;
+                            break;
+                        }
+                        msg = `[+]插件${reloadPluginName}已重载`;
+
                         break;
                     default:
                         msg = help();

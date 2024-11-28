@@ -1,9 +1,9 @@
 {
   "name": "koibot",
   "version": "1.0.0",
-  "main": "src/index.ts",
+  "main": "app.ts",
   "scripts": {
-    "start": "npx tsx src/index.ts"
+    "start": "npx tsx app.ts"
   },
   "type": "module",
   "keywords": [
@@ -17,6 +17,7 @@
     "@types/node": "^22.10.0",
     "axios": "^1.7.8",
     "jiti": "^2.4.0",
+    "node-cron": "^3.0.3",
     "node-napcat-ts": "^0.4.0",
     "tsx": "^4.19.2",
     "winston": "^3.17.0",
