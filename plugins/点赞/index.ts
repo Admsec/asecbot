@@ -1,5 +1,5 @@
-import { logger, Structs } from "node-napcat-ts";
-import { definePlugin } from "../../src/plugin";
+import {Structs} from "node-napcat-ts";
+import {log, definePlugin} from "../../src";
 
 export default definePlugin({
   name: "点赞",
@@ -20,7 +20,7 @@ export default definePlugin({
               Structs.text("今天赞过了哦, 明天再来吧!(●'◡'●)"),
             ], true);
           } else {
-            logger.warn(`[-]插件执行出错: ${err.message}`);
+            log.warn(`[-]插件执行出错: ${err.message}`);
             await e["quick_action"]([
               Structs.text(`点赞失败, 原因: ${err.message}`)
             ], true);

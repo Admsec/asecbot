@@ -1,6 +1,5 @@
 import {Structs} from "node-napcat-ts";
-import { definePlugin } from "../../src/plugin";
-import {logger} from "../../src/"
+import {definePlugin, log} from "../../src/"
 
 export default definePlugin({
   // 插件名应和文件名一致, 不然可能会出问题

@@ -52,7 +52,7 @@ cnpm install
 
 5. 填写 config.yaml 文件
 
-```
+```yaml
 napcat:
   baseUrl: 'ws://localhost:3001'
   accessToken: ''
@@ -67,9 +67,19 @@ self:
   master: []  # 主人
 ```
 
-6. koibot 启动！
+6. 创建 app.js 文件, 填写内容如下
+
+```ts
+// [koibot]/app.js
+import {Bot} from "./src/index.ts";
+new Bot().start()
+```
+
+7. koibot 启动！
 
 ```
-npm start
+npm start 
+or
+npx jiti app.js
 ```
 

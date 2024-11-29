@@ -1,6 +1,5 @@
 import { Structs } from "node-napcat-ts";
-import { definePlugin } from "../../src/plugin";
-import {logger} from "../../src/"
+import {definePlugin} from "../../src/"
 
 export default definePlugin({
     name: "bot管理",
