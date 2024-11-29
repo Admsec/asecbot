@@ -1,9 +1,9 @@
 {
   "name": "koibot",
-  "version": "1.1.0",
-  "main": "app.js",
+  "version": "1.1.1",
+  "main": "/src/index.ts",
   "scripts": {
-    "start": "npx jiti app.js"
+    "start": "npx jiti app.ts"
   },
   "type": "module",
   "keywords": [

@@ -67,10 +67,10 @@ self:
   master: []  # 主人
 ```
 
-6. 创建 app.js 文件, 填写内容如下
+6. 创建 app.ts 文件, 填写内容如下
 
 ```ts
-// [koibot]/app.js
+// [koibot]/app.ts
 import {Bot} from "./src/index.ts";
 new Bot().start()
 ```
@@ -80,6 +80,6 @@ new Bot().start()
 ```
 npm start 
 or
-npx jiti app.js
+npx jiti app.ts
 ```
 
