@@ -7,6 +7,7 @@ import {parse} from "yaml";
 import axios from "axios";
 import {createJiti} from "jiti"
 import {readdirSync} from "node:fs";
+import * as cron from "node-cron";
 
 // Config
 export function getConfig(): Config {
@@ -53,6 +54,7 @@ export interface Config {
 }
 
 // Index
+
 const logo = `
 _______________#########_______________________ 
 ______________############_____________________ 
@@ -173,6 +175,7 @@ interface PluginInfo {
     setup: {
         enable: boolean,
         listeners: Array<listener>;
+        cron: Array<any>;
     }
 }
 
@@ -198,6 +201,11 @@ interface KoiPluginContext {
     http: typeof axios;
     bot: NCWebsocket;
     plugin: pluginUtil;
+    /** cron 定时任务 */
+    cron: (
+        expression: string,
+        func: () => any
+    ) => any;
     /** 注册事件处理器 */
     handle: <EventName extends keyof EventHandleMap>(
         eventName: EventName,
@@ -222,11 +230,6 @@ interface KoiPlugin {
     version?: string;
     /** 插件描述 */
     description?: string;
-    /** cron 定时任务 */
-    // cron?: [
-    //   string,
-    //   (ctx: KoiPluginContext, now: Date | "manual" | "init") => any
-    // ][];
     /** 插件初始化，可返回一个函数用于清理 */
     setup?: (ctx: KoiPluginContext) => any;
 }
@@ -237,6 +240,7 @@ export class PluginManager {
     public bot: NCWebsocket;
     public ctx: KoiPluginContext;
     private tempListener: Array<listener>;
+    private tempCronJob: Array<any>;
     private jiti: any;
 
     constructor(bot: NCWebsocket, config: Config) {
@@ -245,10 +249,19 @@ export class PluginManager {
         this.jiti = createJiti(import.meta.url, {moduleCache: false})
         this.bot = bot;
         this.tempListener = [];
+        this.tempCronJob = [];
         this.ctx = {
             config: config,
             http: axios,
             bot: this.bot,
+            cron: (expression, func) => {
+                    if(!cron.validate(expression)){
+                        this.tempCronJob.push(false)
+                    }
+                    this.tempCronJob.push(cron.schedule(expression, func, {
+                        scheduled: false
+                    }))
+            },
             plugin: {
                 getPlugins: () => {
                     return this.getPlugins();
@@ -330,14 +343,16 @@ export class PluginManager {
                 description: plugin.default.description || "",
                 setup: {
                     enable: false,
-                    listeners: this.tempListener
+                    listeners: this.tempListener,
+                    cron: this.tempCronJob
                 }
             })
             log.info(this.onPlugin(plugin.default.name))
             this.tempListener = [];
+            this.tempCronJob = [];
             return plugin;
         } catch (err) {
-            log.error(`[-]插件导入失败, 原因: ${err.message}`)
+            log.error(`[-]插件${pluginPath}导入失败, 原因: ${err}`)
             return false
         }
 
@@ -358,6 +373,9 @@ export class PluginManager {
         for (const p of map.setup.listeners) {
             this.bot.off(p.event, p.fn)
         }
+        for (const p of map.setup.cron) {
+            p.stop()
+        }
         map.setup.enable = false;
         return `[+]插件${pluginName}已禁用`
     }
@@ -370,8 +388,16 @@ export class PluginManager {
         if (map?.setup && map.setup?.enable) {
             return "[-]该插件没有被禁用"
         }
+        // 插件函数
         for (const p of map.setup.listeners) {
             this.bot.on(p.event, p.fn)
+        }
+        // 定时任务
+        for (const p of map.setup.cron) {
+            if(!p){
+                return `[-]插件${pluginName}的定时任务启动出错, 请检查一下cron表达式`
+            }
+            p.start()
         }
         map.setup.enable = true;
         return `[+]插件${pluginName}已启用`

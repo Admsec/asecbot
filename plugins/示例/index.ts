@@ -10,5 +10,10 @@ export default definePlugin({
       if(e.raw_message != "12345") return;
       await e.quick_action([Structs.text("上山打老虎")])
     })
+
+    // 可设置多个 cron
+    // ctx.cron("*/3 * * * * *", () => {
+    //   log.info(2131231)
+    // })
   }
 })
