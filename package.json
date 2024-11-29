@@ -7,12 +7,16 @@
   },
   "type": "module",
   "keywords": [
-    "koibot",
+    "asecbot",
     "QQ机器人"
   ],
   "author": "Admsec",
   "license": "ISC",
-  "description": "KoiBot - 一个基于 node-napcat-ts 的 QQ 机器人",
+  "description": "AsecBot - 一个基于 node-napcat-ts 的 QQ 机器人",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Admsec/asecbot"
+  },
   "dependencies": {
     "@types/node": "^22.10.0",
     "axios": "^1.7.8",

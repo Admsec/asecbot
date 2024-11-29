@@ -1,4 +1,4 @@
-## KoiBot - 一个基于 node-napcat-ts 的 QQ 机器人
+## AsecBot- 一个基于 node-napcat-ts 的 QQ 机器人
 
 使用方法：
 
@@ -37,9 +37,9 @@
 3. 下载该项目
 
 ```
-npm install koibot
+npm install asecbot
 # or
-cnpm install koibot
+cnpm install asecbot
 ```
 
 4. 安装依赖
@@ -70,12 +70,12 @@ self:
 6. 创建 app.ts 文件, 填写内容如下
 
 ```ts
-// [koibot]/app.ts
+// [asecbot]/app.ts
 import {Bot} from "./src/index.ts";
 new Bot().start()
 ```
 
-7. koibot 启动！
+7. asecbot 启动！
 
 ```
 npm start 
