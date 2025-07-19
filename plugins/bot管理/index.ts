@@ -16,7 +16,7 @@ export default definePlugin({
     }
 })
 
-function formatTime(time){
+function formatTime(time: number){
     let result = ``
     let minute = 0
     let hour = 0

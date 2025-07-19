@@ -165,7 +165,7 @@ export class Bot {
 
 
 // Plugin
-export function definePlugin(plugin: KoiPlugin): KoiPlugin {
+export function definePlugin(plugin: AsecPlugin): AsecPlugin {
     return plugin;
 }
 
@@ -189,13 +189,13 @@ interface pluginUtil {
     getPlugins: () => Map<string, PluginInfo>;
     onPlugin: (pluginName: string) => string;
     offPlugin: (pluginName: string) => string;
-    reloadPlugin: (pluginName: string) => Promise<string>;
+    reloadPlugin: (pluginName: string) => Promise<{result: boolean, msg: string}>;
     getPluginsFromDir: () => string[];
     loadPlugin: (pluginName: string) => Promise<string>;
 }
 
 
-interface KoiPluginContext {
+export interface AsecPluginContext {
     config: Config;
     /** axios 实例 */
     http: typeof axios;
@@ -223,7 +223,7 @@ interface KoiPluginContext {
     ) => boolean;
 }
 
-interface KoiPlugin {
+interface AsecPlugin {
     /** 插件 ID */
     name: string;
     /** 插件版本 */
@@ -231,14 +231,14 @@ interface KoiPlugin {
     /** 插件描述 */
     description?: string;
     /** 插件初始化，可返回一个函数用于清理 */
-    setup?: (ctx: KoiPluginContext) => any;
+    setup?: (ctx: AsecPluginContext) => any;
 }
 
 
 export class PluginManager {
     public plugins: Map<string, PluginInfo>;
     public bot: NCWebsocket;
-    public ctx: KoiPluginContext;
+    public ctx: AsecPluginContext;
     private tempListener: Array<listener>;
     private tempCronJob: Array<any>;
     private jiti: any;
@@ -272,7 +272,7 @@ export class PluginManager {
                 offPlugin: (pluginName: string) => {
                     return this.offPlugin(pluginName)
                 },
-                reloadPlugin: (pluginName: string): Promise<string> => {
+                reloadPlugin: (pluginName: string): Promise<{result: boolean, msg: string}> => {
                     return this.reloadPlugin(pluginName)
                 },
                 getPluginsFromDir: (): string[] => {
@@ -403,18 +403,22 @@ export class PluginManager {
         return `[+]插件${pluginName}已启用`
     }
 
-    async reloadPlugin(pluginName: string): Promise<any> {
+    async reloadPlugin(pluginName: string): Promise<{result: boolean, msg: string}> {
         const pluginPath = join(process.cwd(), "plugins", pluginName, "index.ts");
         if (!this.plugins.has(pluginName) && !existsSync(pluginPath)) {
-            return "[-]该插件不存在"
+            return {result: false, msg: "[-]该插件不存在"}
         }
-        const map = this.plugins.get(pluginName) as PluginInfo;
+        const map = this.plugins.get(pluginName);
         // 如果缓存有
         // 如果插件目前是开启的
         if (map?.setup && map.setup?.enable) {
-            log.info(this.offPlugin(pluginName));
+            this.offPlugin(pluginName)
+            this.onPlugin(pluginName)
+            return {result: true, msg: `[+]插件${pluginName}已重载`}
+        } else {
+          this.onPlugin(pluginName)
+          return {result: true, msg: `[+]插件${pluginName}已重载`}
         }
-        return await this.loadPlugin(pluginPath)
     }
 
 

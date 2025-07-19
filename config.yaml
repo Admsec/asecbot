@@ -1,6 +1,6 @@
 napcat:
-  baseUrl: 'ws://localhost:3001'
-  accessToken: ''
+  baseUrl: 'ws://192.168.192.100:3001'
+  accessToken: '120422'
   throwPromise: false  # 是否需要在触发 socket.error 时抛出错误，默认关闭
   reconnection:
     enable: true

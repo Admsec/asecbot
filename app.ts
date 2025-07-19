@@ -1,3 +1,3 @@
-import {Bot} from "./src/index.ts";
+import {Bot} from "./src/index";
 
 new Bot().start()
