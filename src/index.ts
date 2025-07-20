@@ -403,6 +403,11 @@ export class PluginManager {
         return `[+]插件${pluginName}已启用`
     }
 
+    /**
+     * @todo 实现真重载
+     * @param pluginName 
+     * @returns 
+     */
     async reloadPlugin(pluginName: string): Promise<{result: boolean, msg: string}> {
         const pluginPath = join(process.cwd(), "plugins", pluginName, "index.ts");
         if (!this.plugins.has(pluginName) && !existsSync(pluginPath)) {

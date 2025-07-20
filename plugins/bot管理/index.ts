@@ -9,7 +9,7 @@ export default definePlugin({
             if(!ctx.isMaster(e)) return;
             if(e.raw_message == "还在吗"){
                 const memoryUsage = process.memoryUsage().rss;
-                const msg =  `我一直都在哦！已经运行了${formatTime(process.uptime())}啦~\n当前内存使用: ${(memoryUsage / 1024 ** 2).toFixed(2)}MB`
+                const msg =  `在的喵~！已经运行了${formatTime(process.uptime())}啦~\n当前内存使用: ${(memoryUsage / 1024 ** 2).toFixed(2)}MB`
                 await e.quick_action([Structs.text(msg)])
             }
         })
