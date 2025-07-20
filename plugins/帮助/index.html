@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" integrity="sha512-NhSC1YmyruXifcj/KFRWoC561YpHpc5Jtzgvbuzx5VozKpWvQ+4nXhPdFgmx8xqexRcpAglTj9sIBWINXa8x5w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+        * {
+      padding: 0;
+      margin: 0;
+      box-sizing: border-box;
+    }
+    #app {
+      width: 600px;
+      aspect-ratio: 1 / 1.5;
+      display: grid;
+      grid-template-rows: 150px 1fr 1fr 50px;
+      row-gap: 15px;
+    }
+
+    .row {
+      border-radius: 10px;
+      box-shadow: 0px 0px 5px 0px #6D6D6D;
+      ;
+    }
+
+    .row1 {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .row2 {
+      background-color: #fff;
+      box-shadow: 0px 0px 5px 0px #6D6D6D;
+      ;
+    }
+
+    .row1-content {
+      width: 95%;
+      height: 90%;
+      background-image: url(https://bu.dusays.com/2025/07/20/687cb507d9266.jpg);
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: cover;
+      border-radius: 15px;
+    }
+
+    .introduce {
+      margin-top: 30px;
+      font-style: italic;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .introduce,
+    .version {
+      margin-left: 30px;
+    }
+
+    .version {
+      font-size: 14px;
+    }
+
+    .row2-content {
+      margin: 10px 15px;
+      width: 580px;
+      height: 95%;
+    }
+
+    .title {
+      padding: 3px 5px;
+      background-color: #d7b995;
+      border-radius: 15% 0;
+      color: #fff;
+    }
+
+    .admin-plugins {
+      display: grid;
+      margin-top: 15px;
+      grid-template-columns: repeat(4, 1fr);
+      column-gap: 15px;
+      row-gap: 10px;
+    }
+
+    .plugin {
+      min-height: 100px;
+    }
+
+    .plugin {
+      padding: 10px 5px;
+      background-color: #f1f1f1;
+      border-radius: 10px;
+      box-shadow: 0px 0px 2px 0px #6D6D6D;
+      ;
+    }
+
+    .name {
+      font-size: 14px;
+      text-decoration: overline;
+      font-style: italic;
+      color: rgba(0, 0, 0, .7);
+      padding-bottom: 5px;
+    }
+
+    .desc, .usage {
+      font-size: 15px;
+      padding-left: 5px;
+    }
+    .usage{
+      color: #a98351;
+      font-size: 14px;
+    }
+    .bottom {
+      text-align: center;
+      line-height: 50px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <div class="row1 row">
+      <div class="row1-content">
+        <div class="introduce">Asec-Bot</div>
+        <div class="version">{{version}}</div>
+      </div>
+    </div>
+    <div class="row2 row">
+      <div class="row2-content">
+        <span class="title">管理员指令</span>
+        <div class="admin-plugins">
+          <template v-for="plugin in plugins">
+            <div class="plugin" v-if="plugin.admin">
+              <div class="name">
+                {{ plugin.name }}
+              </div>
+              <div class="desc">
+                {{ plugin.desc }}
+              </div>
+              <div class="usage">
+                {{ plugin.usage }}
+              </div>
+            </div>
+          </template>
+        </div>
+      </div>
+    </div>
+    <div class="row3 row">
+      <div class="row2-content">
+        <span class="title">普通指令</span>
+        <div class="admin-plugins">
+          <template v-for="plugin in plugins">
+            <div class="plugin"  v-if="!plugin.admin">
+              <div class="name">
+                {{ plugin.name }}
+              </div>
+              <div class="desc">
+                {{ plugin.desc }}
+              </div>
+              <div class="usage">
+                {{ plugin.usage }}
+              </div>
+            </div>
+          </template>
+        </div>
+      </div>
+    </div>
+    <div class="row4">
+      <div class="bottom">© Create By Admsec</div>
+    </div>
+  </div>
+</body>
+
+</html>

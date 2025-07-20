@@ -171,7 +171,9 @@ export function definePlugin(plugin: AsecPlugin): AsecPlugin {
 
 interface PluginInfo {
     version: string,
-    description: string
+    description: string,
+    admin: boolean,
+    usage: string,
     setup: {
         enable: boolean,
         listeners: Array<listener>;
@@ -230,6 +232,10 @@ interface AsecPlugin {
     version?: string;
     /** 插件描述 */
     description?: string;
+    /** 插件用法 */
+    usage?: string;
+    /** 是否仅管理员插件(对帮助面板有用) */
+    admin?: boolean;
     /** 插件初始化，可返回一个函数用于清理 */
     setup?: (ctx: AsecPluginContext) => any;
 }
@@ -341,6 +347,8 @@ export class PluginManager {
             this.plugins.set(plugin.default.name, {
                 version: plugin.default.version || "0.1.0",
                 description: plugin.default.description || "",
+                admin: plugin.default.admin || false,
+                usage: plugin.default.usage || "",
                 setup: {
                     enable: false,
                     listeners: this.tempListener,

@@ -1,9 +1,12 @@
 import { Structs } from "node-napcat-ts";
-import {definePlugin} from "../../src/"
+import {definePlugin} from "../../src"
+
 
 export default definePlugin({
-    name: "bot管理",
-    description: "主人的好帮手",
+    name: "还在吗",
+    description: "显示当前 Bot 的运行时间和内存占用",
+    usage: "还在吗",
+    admin: true,
     setup: (ctx) => {
         ctx.handle("message", async (e) => {
             if(!ctx.isMaster(e)) return;
@@ -13,8 +16,11 @@ export default definePlugin({
                 await e.quick_action([Structs.text(msg)])
             }
         })
+
     }
 })
+
+
 
 function formatTime(time: number){
     let result = ``

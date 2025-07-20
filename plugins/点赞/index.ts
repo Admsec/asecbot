@@ -5,7 +5,8 @@ import {log, definePlugin, AsecPluginContext} from "../../src";
 const key = ["赞我", "草我", "点赞"];
 export default definePlugin({
   name: "点赞",
-  description: `点赞插件, 关键词: ${key.join(" ")}`,
+  description: `点赞插件`,
+  usage: `${key.join("|")}`,
   setup: (ctx) => {
     ctx.handle("message", async (e) => {
       if (key.includes(e.raw_message)) {

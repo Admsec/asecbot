@@ -6,8 +6,9 @@ import words2md from "./words2md";
 
 export default definePlugin({
   // 插件名应和文件名一致, 不然可能会出问题
-  name: "md2图片",
-  description: "实现 md 和图片互转",
+  name: "deepseek-r1",
+  description: "Ai问答",
+  usage: "%[想问的问题]",
   setup: (ctx) => {
     ctx.handle("message", async (e) => {
       if(e.raw_message.startsWith("%")) {
