@@ -146,9 +146,10 @@ export class Bot {
             if (ctx.sub_type == "connect")
                 log.info(`[+]连接成功: ${this.config.napcat.baseUrl}`)
         })
-        this.bot.on("meta_event.heartbeat", (ctx) => {
-            log.info(`[*]心跳包♥`)
-        })
+        /** 显示心跳包好像没啥用 */
+        // this.bot.on("meta_event.heartbeat", (ctx) => {
+        //     log.info(`[*]心跳包♥`)
+        // })
         this.bot.on("message", (ctx) => {
             log.info("[*]receive message: " + ctx.raw_message)
         })

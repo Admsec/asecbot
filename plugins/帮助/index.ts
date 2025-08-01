@@ -6,8 +6,8 @@ import puppeteer from "puppeteer";
 export default definePlugin({
   // 插件名应和文件名一致, 不然可能会出问题
   name: "帮助面板",
-  description: "打开帮助面板",
-  usage: "帮助|help",
+  description: "帮助面板",
+  usage: "帮助 | help",
   setup: (ctx) => {
         ctx.handle("message", async (e) => {
           if(e.raw_message == "help" || e.raw_message == "帮助"){
@@ -37,6 +37,8 @@ async function html2img(html: string) {
   const newPage = await browser.newPage();
   await newPage.setContent(html)
   const pageResult = await newPage.waitForSelector("#app")
-  const b64Data = pageResult?.screenshot({encoding: 'base64'})
+  const b64Data = await pageResult?.screenshot({encoding: 'base64'})
+  await newPage
+  await browser.close()
   return b64Data
 }

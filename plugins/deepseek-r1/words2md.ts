@@ -11,7 +11,7 @@ async function renderHtml(md_header: string, md_body: string, md_footer: string)
   let mdFooter = `> ${md_footer}`
   let md_content = mdHeader + "\n\n" + md_body + "\n\n" + mdFooter
   const md = markdownIt().render(md_content);
-  const css = readFileSync(path.join('plugins', 'md2图片', 'github-markdown-dark.css'), 'utf-8')
+  const css = readFileSync(path.join('plugins', 'deepseek-r1', 'github-markdown-dark.css'), 'utf-8')
   const template = `<meta name="viewport" content="width=device-width, initial-scale=1">
     <style>${css}</style>
     <style>
@@ -68,3 +68,4 @@ export default async (md_header: string, md_footer: string, md_body: string): Pr
   
 
 // })();
+

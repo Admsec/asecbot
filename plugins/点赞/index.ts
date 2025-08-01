@@ -6,7 +6,7 @@ const key = ["赞我", "草我", "点赞"];
 export default definePlugin({
   name: "点赞",
   description: `点赞插件`,
-  usage: `${key.join("|")}`,
+  usage: `${key.join(" | ")}`,
   setup: (ctx) => {
     ctx.handle("message", async (e) => {
       if (key.includes(e.raw_message)) {
@@ -20,7 +20,9 @@ export default definePlugin({
   );
   // 每天自动给主人点赞
     ctx.cron(`${Math.floor(Math.random() * 60)} 6 * * *`, async () => {
-
+      ctx.config.self.master.forEach(async (value, index) => {
+        await ctx.bot.send_like({user_id: value, times: 20})
+      })
     })
 
   },

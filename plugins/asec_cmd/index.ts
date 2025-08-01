@@ -6,8 +6,8 @@ import {definePlugin} from "../../src";
 export default definePlugin({
     name: "asec_cmd",
     version: "0.1.0",
-    description: "插件管理(仅主人可用)",
-    usage: ".p ls|on|off",
+    description: "插件管理",
+    usage: ".p ls | on | off",
     admin: true,
     setup: async (ctx) => {
         ctx.handle("message", async (e) => {
