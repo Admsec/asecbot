@@ -1,5 +1,6 @@
 import {GroupMessage, PrivateFriendMessage, PrivateGroupMessage, Structs} from "node-napcat-ts";
-import {log, definePlugin, AsecPluginContext} from "../../src";
+import {definePlugin} from "../../src/plugin";
+import type { AsecPluginContext } from "../../src/types/plugin.d";
 
 
 const key = ["赞我", "草我", "点赞"];

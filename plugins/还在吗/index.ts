@@ -1,5 +1,5 @@
 import { Structs } from "node-napcat-ts";
-import {definePlugin} from "../../src"
+import {definePlugin} from "../../src/plugin";
 
 
 export default definePlugin({
@@ -9,7 +9,7 @@ export default definePlugin({
     admin: true,
     setup: (ctx) => {
         ctx.handle("message", async (e) => {
-            if(!ctx.isMaster(e)) return;
+            if(!ctx.isMaster(e.sender.user_id)) return;
             if(e.raw_message == "还在吗"){
                 const memoryUsage = process.memoryUsage().rss;
                 const msg =  `在的喵~！已经运行了${formatTime(process.uptime())}啦~\n当前内存使用: ${(memoryUsage / 1024 ** 2).toFixed(2)}MB`

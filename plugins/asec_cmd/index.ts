@@ -1,7 +1,7 @@
 import {Structs} from "node-napcat-ts";
 import {join} from "path";
 import {existsSync} from "fs";
-import {definePlugin} from "../../src";
+import {definePlugin} from "../../src/plugin";
 
 export default definePlugin({
     name: "asec_cmd",
@@ -11,7 +11,7 @@ export default definePlugin({
     admin: true,
     setup: async (ctx) => {
         ctx.handle("message", async (e) => {
-            if (!ctx.isMaster(e)) return;
+            if (!ctx.isMaster(e.sender.user_id)) return;
             if (e.raw_message.startsWith(".p")) {
                 let msg = "", count = 0;
                 const key = e.raw_message.split(" ")
@@ -80,34 +80,31 @@ export default definePlugin({
                         const offPluginResult = ctx.plugin.offPlugin(offPluginName);
                         msg = offPluginResult;
                         break;
-                    /**
-                     * @todo 实现重载插件操作
-                     */
-                    // case 'reload':
-                    //     const reloadPluginName = key?.[2];
-                    //     if(!reloadPluginName) {
-                    //         msg = "[-]请输入要重载的插件名";
-                    //         break;
-                    //     }
-                    //     if(reloadPluginName.endsWith("cmd")){
-                    //       msg = "[-]系统插件, 不可操作"
-                    //       break;
-                    //     }
-                    //     const reloadPluginResult = await ctx.plugin.reloadPlugin(reloadPluginName);
-                    //     if(!reloadPluginResult.result){
-                    //         msg = reloadPluginResult.msg
-                    //         break;
-                    //     }
-                    //     msg = `[+]插件${reloadPluginName}已重载`;
-                    //     break;
+                    case 'reload':
+                        const reloadPluginName = key?.[2];
+                        if(!reloadPluginName) {
+                            msg = "[-]请输入要重载的插件名";
+                            break;
+                        }
+                        if(reloadPluginName.endsWith("cmd")){
+                          msg = "[-]系统插件, 不可操作"
+                          break;
+                        }
+                        const reloadPluginResult = await ctx.plugin.reloadPlugin(reloadPluginName);
+                        if(!reloadPluginResult.result){
+                            msg = reloadPluginResult.msg
+                            break;
+                        }
+                        msg = `[+]插件${reloadPluginName}已重载`;
+                        break;
                     default:
                         msg = help();
                 }
                 await e.quick_action([Structs.text(msg)])
             }
             function help() {
-                // return `.p 查看帮助\n.p ls 插件列表\n.p on [插件] 启用插件\n.p off [插件] 禁用插件\n.p reload [插件] 重载插件`;
-                return `.p 查看帮助\n.p ls 插件列表\n.p on [插件] 启用插件\n.p off [插件] 禁用插件\n`;
+                return `.p 查看帮助\n.p ls 插件列表\n.p on [插件] 启用插件\n.p off [插件] 禁用插件\n.p reload [插件] 重载插件`;
+                // return `.p 查看帮助\n.p ls 插件列表\n.p on [插件] 启用插件\n.p off [插件] 禁用插件\n`;
 
             }
         })

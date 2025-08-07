@@ -1,16 +1,15 @@
 import {Structs} from "node-napcat-ts";
-import {definePlugin, log} from "../../src"
+import {definePlugin} from "../../src/plugin";
 import ai_api from "./ai_api";
 import words2md from "./words2md";
 
-
 export default definePlugin({
-  // 插件名应和文件名一致, 不然可能会出问题
+  // 插件名应和文件名一致, 否则可能会出问题
   name: "deepseek-r1",
   description: "Ai问答",
   usage: "%[想问的问题] | [引用消息]%",
-  setup: (ctx) => {
-    ctx.handle("message", async (e) => {
+  setup: (ctx: any) => {
+    ctx.handle("message", async (e: any) => {
       if(e.raw_message.startsWith("%")) {
         const question = e.raw_message.slice(1)
         if(!question) return
@@ -19,10 +18,10 @@ export default definePlugin({
         await e.quick_action([Structs.image("base64://" + picData as string)])
       }
       if(e.raw_message.endsWith("%")){
-        const historyMessageId = parseInt(e.message.filter(value => value.type === "reply")[0]?.data?.id)
+        const historyMessageId = parseInt(e.message.filter((value: any) => value.type === "reply")[0]?.data?.id)
         if(e.message_type === "group"){
           const groupHistory = await ctx.bot.get_group_msg_history({group_id: e.group_id})
-          const quoteMessages = groupHistory.messages.filter(value => value.message_id === historyMessageId)
+          const quoteMessages = groupHistory.messages.filter((value: any) => value.message_id === historyMessageId)
           if(quoteMessages){
             const quoteMessage = quoteMessages[0].raw_message
             await ctx.bot.send_poke({user_id: e.sender.user_id})
@@ -31,7 +30,7 @@ export default definePlugin({
           }
         } else {
           const privHistory = await ctx.bot.get_friend_msg_history({user_id: e.sender.user_id})
-          const quoteMessages = privHistory.messages.filter(value => value.message_id === historyMessageId)
+          const quoteMessages = privHistory.messages.filter((value: any) => value.message_id === historyMessageId)
           if(quoteMessages){
             const quoteMessage = quoteMessages[0].raw_message
             await ctx.bot.send_poke({user_id: e.sender.user_id})

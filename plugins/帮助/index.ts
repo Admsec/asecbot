@@ -1,5 +1,5 @@
 import {Structs} from "node-napcat-ts";
-import {definePlugin, log} from "../../src/"
+import {definePlugin} from "../../src/plugin";
 import { render } from "./render";
 import puppeteer from "puppeteer";
 
